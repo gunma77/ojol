@@ -1,0 +1,28 @@
+{
+  "level_id": "lvl_01",
+  "title": "Maju dan Belok",
+  "allowed_commands": ["maju", "belokKanan", "belokKiri", "putarBalik", "mundur"],
+  "optimal_loc": 3,
+  "start": {
+    "node": "A",
+    "bearing": 90
+  },
+  "goal": "D",
+  "nodes": {
+    "A": [107.607, -6.9215],
+    "B": [107.608, -6.9215],
+    "C": [107.609, -6.9215],
+    "D": [107.609, -6.9225],
+    "E": [107.608, -6.9225]
+  },
+  "edges": [
+    { "from": "A", "to": "B", "bearing": 90 },
+    { "from": "B", "to": "A", "bearing": 270 },
+    { "from": "B", "to": "C", "bearing": 90 },
+    { "from": "C", "to": "B", "bearing": 270 },
+    { "from": "C", "to": "D", "bearing": 180 },
+    { "from": "D", "to": "C", "bearing": 0 },
+    { "from": "D", "to": "E", "bearing": 270 },
+    { "from": "E", "to": "D", "bearing": 90 }
+  ]
+}

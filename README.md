@@ -1,56 +1,118 @@
-# Welcome to your Expo app 👋
+# CodePath: Ojol Edition
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplikasi mobile Android untuk belajar logika pemrograman: tulis skrip pseudocode, lalu lihat motor ojol bergerak mengikuti kodemu di atas peta nyata. Berjalan 100% offline.
 
-## Get started
+> **Status:** dalam perancangan. Bagian "Memulai" mengasumsikan proyek sudah diinisialisasi (lihat `todo.md`, WBS 1.1); sesuaikan dengan isi repositori.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Cara Kerja
 
-2. Start the app
+1. Kamu mengetik skrip di editor teks.
+2. Tekan **Kompilasi & Jalankan**.
+3. Kompilator mini memeriksa penulisanmu. Kalau ada yang salah, baris yang bermasalah disorot beserta pesan yang ramah.
+4. Kalau benar, motor bergerak di peta sesuai skripmu.
+5. Kalau sampai tujuan, kamu mendapat **0–3 bintang** berdasarkan seberapa ringkas kodemu.
 
-   ```bash
-   npx expo start
-   ```
+## Contoh Skrip
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+maju(3);
+belok_kanan();
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Perintah yang tersedia berbeda di tiap level (`allowed_commands`). Aturan sintaks lengkap ada di `technical.md`.
 
-### Other setup steps
+## Fitur
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- Editor teks dengan nomor baris, penyorotan sintaks, dan penghitung baris kode (LOC)
+- Kompilator mini: Lexer → Parser → Interpreter
+- Pesan Syntax Error yang ramah dengan penyorotan baris
+- Deteksi motor keluar jalur (CRASH) dan perlindungan dari infinite loop
+- Animasi motor di atas peta jalan nyata
+- Penilaian bintang berdasarkan efisiensi LOC
+- Daftar level dengan status gembok, progres dan draf skrip tersimpan lokal
+- Layout menyesuaikan keyboard agar peta tetap terlihat
 
-## Learn more
+## Tech Stack
 
-To learn more about developing your project with Expo, look at the following resources:
+| Bagian | Teknologi |
+|---|---|
+| Framework | React Native (Expo), TypeScript |
+| Peta | MapLibre atau react-native-maps (belum diputuskan) |
+| Animasi | Reanimated |
+| State | Zustand |
+| Penyimpanan | AsyncStorage |
+| Build | EAS Build |
+| Platform | Android 8.0 ke atas |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Arsitektur Singkat
 
-## Join the community
+```
+Presentation (UI, peta, editor)
+        │
+Compiler Engine (TypeScript murni: Lexer → Parser → Interpreter)
+        │
+State & Persistence (Zustand, AsyncStorage)
+```
 
-Join our community of developers creating universal apps.
+Mesin kompilator tidak bergantung pada UI sehingga mudah diuji tersendiri. Detail ada di `technical.md`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Struktur Proyek
+
+```
+src/
+├─ components/editor/     # CodeEditor, penanganan keyboard
+├─ engine/compiler/       # lexer.ts, parser.ts, interpreter.ts
+└─ ...                    # peta, store, data level (lihat technical.md)
+docs/                     # dokumen perancangan
+```
+
+## Memulai
+
+**Prasyarat:** Node.js (LTS), perangkat Android atau emulator (Android 8.0 ke atas), dan akun Expo untuk EAS Build.
+
+```bash
+npm install
+npx expo start          # jalankan dev server
+npx expo run:android    # development build (jika memakai pustaka peta native)
+npm test                # tes unit engine
+```
+
+Membuat APK:
+
+```bash
+eas build -p android --profile preview
+```
+
+Profil build dikonfigurasi di `eas.json`.
+
+## Dokumentasi
+
+| Dokumen | Isi |
+|---|---|
+| `prd.md` | Kebutuhan produk, cakupan, user story, pertanyaan terbuka |
+| `design.md` | Desain layar, editor, alur interaksi |
+| `technical.md` | Arsitektur, bahasa pseudocode, kontrak data, pengujian |
+| `todo.md` | Daftar kerja per minggu |
+| `ai_context.md` | Konteks ringkas untuk asisten AI dan kontributor |
+| Project Documentation v2.0 | SRS, SDD, SPMP sumber |
+
+## Tim
+
+| Peran | Tanggung jawab |
+|---|---|
+| Project Manager & Lead Architect | Kontrak data AST dan rute GeoJSON, tinjauan Parser |
+| Compiler Engine Developer | Lexer, Parser, Interpreter |
+| Map & Animation Developer | Peta dan animasi motor |
+| UI & Text Editor Developer | Editor teks dan penanganan keyboard |
+
+Penyusun dokumen: Ananta Syawal Utama / Tim CodePath.
+
+## Peta Jalan
+
+Rencana lima minggu: inisialisasi, Lexer dan peta, Parser dan editor, keyboard dan penilaian, lalu pengujian dan rilis APK. Rinciannya ada di `todo.md`.
+
+## Lisensi
+
+Belum ditentukan.
