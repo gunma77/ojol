@@ -20,7 +20,7 @@ Dokumen desain antarmuka dan pengalaman pengguna, diturunkan dari SRS Bagian 3.1
 |---|---|---|
 | Daftar Level | Level beserta status gembok dan bintang | SRS 2.2 |
 | Layar Permainan | Kanvas Peta + Panel Code Editor | SRS 3.1 |
-| Modal Evaluasi | Jumlah bintang jika berhasil | SRS 3.1 |
+| Ringkasan Hasil | Jumlah bintang, LOC, dan waktu kompilasi | FR-10–FR-12 |
 | Modal Error | Baris dan pesan Syntax Error | SRS 3.1 |
 | **[Usulan]** Modal Gagal (CRASH / tidak sampai) | Penyebab dan langkah terjadinya | FR-07 |
 
@@ -101,11 +101,11 @@ Prinsip: sebut **baris**, sebut **apa yang kurang**, gunakan bahasa yang bersaha
 
 Daftar lengkap dan kode galat ada di `technical.md`.
 
-## 6. Modal Evaluasi dan Hasil
+## 6. Ringkasan Hasil dan Error
 
 | Hasil | Tampilan |
 |---|---|
-| Berhasil | Bintang 1–3 + jumlah LOC dibanding target optimal; tombol "Ulangi" dan "Level berikutnya" |
+| Berhasil | Bintang 1–3, LOC, waktu kompilasi, dan bintang terbaik ditampilkan pada panel hasil |
 | Syntax Error | Nomor baris + pesan; baris disorot di editor; tombol "Perbaiki" |
 | CRASH / tidak sampai | Penyebab (keluar jalur, tidak sampai tujuan) dan posisi berhentinya motor; tombol "Coba lagi" |
 
@@ -128,9 +128,9 @@ Daftar Level ──(pilih level terbuka)──► Layar Permainan
                  kembali mengetik                  ┌───────────┴───────────┐
                                                 CRASH / gagal         Sampai tujuan
                                                    │                       │
-                                              Modal Gagal             Modal Evaluasi
-                                                   │                  (bintang, buka
-                                              kembali mengetik         level berikutnya)
+                                              Modal Gagal             Ringkasan Hasil
+                                                   │                  (bintang, progres
+                                              kembali mengetik         tersimpan lokal)
 ```
 
 ## 8. Peta dan Animasi
@@ -156,7 +156,7 @@ Daftar Level ──(pilih level terbuka)──► Layar Permainan
 
 - Setiap level menampilkan judul, bintang terbaik, dan status gembok.
 - Level terbuka setelah level sebelumnya diselesaikan dengan minimal 1 bintang **[Usulan]**.
-- Jumlah level versi pertama: **[Belum diputuskan — OQ-08]**.
+- Satu level untuk setiap materi pembelajaran untuk siswa SMA kelas X (ADR-09); total level mengikuti daftar materi.
 
 ## 11. Keputusan Desain yang Masih Terbuka
 

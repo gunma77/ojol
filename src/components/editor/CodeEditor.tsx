@@ -134,7 +134,7 @@ export const CodeEditor = memo(function CodeEditor({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    minHeight: 140,
+    minHeight: 0,
     backgroundColor: '#ffffff',
     borderRadius: 14,
     borderWidth: 1,

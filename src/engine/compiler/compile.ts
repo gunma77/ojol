@@ -19,6 +19,20 @@ function validateLevel(level: LevelData) {
     throw new EngineError('E10', 0, 'Data level tidak lengkap: titik awal atau tujuan tidak ditemukan.');
   }
 
+  if (!Number.isInteger(level.optimal_loc) || level.optimal_loc < 1) {
+    throw new EngineError('E10', 0, 'Data level tidak valid: optimal_loc harus bilangan bulat positif.');
+  }
+
+  if (
+    level.star_thresholds &&
+    (!Number.isInteger(level.star_thresholds.three) ||
+      !Number.isInteger(level.star_thresholds.two) ||
+      level.star_thresholds.three < 0 ||
+      level.star_thresholds.two < level.star_thresholds.three)
+  ) {
+    throw new EngineError('E10', 0, 'Data level tidak valid: ambang bintang tidak berurutan.');
+  }
+
   if (!Number.isFinite(level.start.bearing) || level.start.bearing < 0 || level.start.bearing >= 360) {
     throw new EngineError('E10', 0, 'Data level tidak valid: arah awal harus berada pada 0–359°.');
   }

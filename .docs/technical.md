@@ -21,7 +21,7 @@ Arsitektur **Decoupled Client-Side**, tanpa backend, 100% offline.
 └───────────────┬──────────────────────────────▲───────────────┘
                 │ simpan/muat                  │
 ┌───────────────▼──────────────────────────────┴───────────────┐
-│ State & Persistence Layer (Zustand, AsyncStorage)            │
+│ State & Persistence Layer (React state, AsyncStorage)         │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -32,7 +32,7 @@ Arsitektur **Decoupled Client-Side**, tanpa backend, 100% offline.
 | Framework | React Native (Expo), TypeScript | |
 | Peta | `@maplibre/maplibre-react-native` | ADR-06: graph level digambar di atas latar polos tanpa ubin jaringan |
 | Animasi | Reanimated | Interpolasi antar koordinat |
-| State | Zustand | Teks skrip, bintang, status level |
+| State | React state | Skrip aktif, pilihan level, status UI |
 | Penyimpanan | AsyncStorage | Draf skrip dan progres |
 | Build | EAS Build (`.apk`) | |
 | Platform | Android ≥ 8.0 | |
@@ -43,14 +43,19 @@ Dari SDD:
 
 ```
 src/
-├─ components/editor/       # CodeEditor.tsx + manajemen virtual keyboard
-└─ engine/compiler/
-   ├─ lexer.ts              # string → Token[]
-   ├─ parser.ts             # Token[] → AST (melempar SyntaxError)
-   └─ interpreter.ts        # AST → TrajectoryStep[]
+├─ components/
+│  ├─ editor/               # CodeEditor.tsx + manajemen virtual keyboard
+│  ├─ game/                 # layar permainan
+│  ├─ level/                # daftar level dan status progres
+│  └─ map/                  # peta dan animasi motor
+├─ data/levels/              # JSON level
+├─ engine/
+│  ├─ compiler/              # lexer.ts, parser.ts, interpreter.ts
+│  └─ scoring.ts             # hasil kompilasi → bintang berbasis LOC
+└─ store/progress.ts         # progres dan draf melalui AsyncStorage
 ```
 
-**[Usulan]** tambahan: `components/map/`, `store/`, `data/levels/`, `types/`, `engine/scoring.ts`, `engine/world.ts` (model jalur).
+**[Usulan]** tambahan: `types/`, `engine/world.ts` (model jalur).
 
 Aturan ketergantungan: `engine/*` tidak boleh mengimpor React, React Native, peta, atau storage.
 
@@ -118,9 +123,9 @@ komentar   := "#" sampai akhir baris
 
 `maju(n)` dan `mundur(n)` memerlukan bilangan bulat 1–99. Perintah belok tidak menerima argumen. Nama peka huruf besar-kecil dan perintah harus ada pada `allowed_commands`. Dua statement dalam satu baris adalah Syntax Error. LOC mengikuti ADR-03: jumlah baris berisi statement; komentar dan baris kosong diabaikan.
 
-### 5.2 Perluasan jika cakupan mencakup percabangan dan perulangan **[Belum diputuskan — OQ-07]**
+### 5.2 Struktur kontrol v1 (cakupan diputuskan di ADR-09)
 
-Dokumen sumber belum memuat struktur kontrol. Jika versi ini diperluas, kandidat sintaks:
+Dokumen sumber belum memuat struktur kontrol. Contoh berikut masih kandidat sintaks, bukan tata bahasa final:
 
 ```
 # perintah gerak tambahan
@@ -146,6 +151,7 @@ Catatan untuk keputusan ini:
 - Batas langkah FR-08 baru benar-benar relevan setelah ada perulangan.
 - Perilaku `selama` pada pertigaan (berhenti otomatis lalu lanjut ke baris berikutnya) harus dirumuskan eksplisit di spesifikasi.
 - Gaya penamaan harus seragam dengan versi dasar (snake_case atau camelCase).
+- Daftar kondisi/sensor dan batas iterasi harus ditetapkan sebelum implementasi parser/interpreter.
 
 ## 6. Model Dunia dan Level
 
@@ -184,6 +190,7 @@ Contoh ini menggunakan nama perintah lama dan telah digantikan oleh skema v1 di 
 - `belokKanan()` mengubah bearing +90° tanpa mengubah posisi; semantik lengkap ada di ADR-01.
 - Ruas berarah; jalan dua arah ditulis sebagai dua edge.
 - `star_thresholds` dan `max_statements` opsional mengikuti ADR-05 dan ADR-07.
+- ADR-09 menetapkan satu level untuk setiap materi; daftar materi dan jenjang siswa masih menunggu keputusan OQ-08.
 
 ## 7. Kontrak Data
 
@@ -263,15 +270,16 @@ Level dapat menetapkan `star_thresholds.three` dan `star_thresholds.two`; jika t
 | `codepath/progress` | `{ [levelId]: { stars: 0–3, unlocked: boolean } }` |
 | `codepath/draft/{levelId}` | string skrip terakhir (FR-13) |
 
-Zustand menyimpan skrip aktif, status kompilasi, hasil, dan progres; disinkronkan ke AsyncStorage saat berubah. Karena skrip dibatasi 1000 karakter, ukuran data kecil.
+React state menyimpan skrip aktif dan status UI; progres terbaik dan draf disimpan di AsyncStorage. Kegagalan baca/tulis ditampilkan kepada pengguna, tidak diabaikan. Karena skrip dibatasi 1000 karakter, ukuran data kecil.
 
 ## 11. Editor dan Keyboard
 
 - `TextInput multiline` dengan **overlay** pewarnaan sintaks berbasis Regex (SDD 4.1).
 - Penomoran baris sinkron dengan scroll.
-- `KeyboardAvoidingView` agar peta mengecil dan editor tetap bisa diketik (FR-03, SPMP risiko 2).
+- `KeyboardAvoidingView` agar peta mengecil dan editor tetap bisa diketik (FR-03, SPMP risiko 2); Android memakai `adjustResize`.
 - Batas 50 baris / 1000 karakter.
 - Pewarnaan overlay harus disejajarkan dengan teks (font, ukuran, padding sama); uji pada beberapa ukuran layar.
+- Syntax Error ditampilkan dalam modal dengan nomor baris; baris yang salah disorot setelah modal ditutup.
 
 ## 12. Performa dan Batas
 
@@ -283,7 +291,7 @@ Zustand menyimpan skrip aktif, status kompilasi, hasil, dan progres; disinkronka
 | Maksimum statement | 500 secara default; dapat ditimpa per level | ADR-07 |
 | Panjang skrip | 50 baris / 1000 karakter | SPMP |
 
-Tanpa perulangan (OQ-07), batas statement 500 tidak tercapai oleh editor 50 baris, tetapi interpreter tetap menerapkan batas ini sebagai guard.
+Dengan perulangan (ADR-09), batas statement 500 diperlukan sebagai guard terhadap eksekusi yang tidak berhenti.
 
 ## 13. Pengujian
 
@@ -296,6 +304,7 @@ Strategi dari SPMP: **black-box testing** (mengetik teks asal untuk memeriksa va
 | Interpreter | Unit | `maju(3);` menghasilkan 3 langkah `MOVE`; langkah keluar jalur menghasilkan `CRASH` |
 | Batas langkah | Unit | Eksekusi yang terlalu panjang dihentikan dengan E07 |
 | Penilai | Unit | Tabel input LOC dan hasil bintang |
+| Progres | Unit/manual | Level pertama terbuka; bintang terbaik dan draf tersimpan lokal |
 | Performa | Unit | Kompilasi skrip 50 baris ≤ 100 ms |
 | Integrasi | Manual/otomatis | Ketik, jalankan, animasi, modal hasil |
 | Uji pengguna | Manual | Beberapa siswa mencoba; catat titik macet |
@@ -318,11 +327,8 @@ Kasus black-box awal: teks kosong, hanya spasi, karakter acak, kurung tak seimba
 | Penilaian berbasis LOC | Mendorong kode yang ringkas |
 | Trajectory Array sebagai perantara | Memisahkan logika dari animasi |
 
-## 16. Isu Terbuka (ringkasan)
+## 16. Jumlah Level
 
-| Kode | Isu |
-|---|---|
-| OQ-07 | Percabangan dan perulangan |
-| OQ-08 | Jenjang pengguna dan jumlah level |
+Jenjang v1 adalah SMA kelas X dan tersedia satu level per materi (ADR-09). Jumlah akhir ditentukan oleh daftar materi yang disusun untuk rilis.
 
 Isu kecil pada dokumen sumber: tanggal masih berisi placeholder dan judul "5. Kebutuhan Non-Fungsional" menyatu dengan NFR-01.

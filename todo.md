@@ -4,7 +4,7 @@ Daftar kerja diturunkan dari SPMP Bagian 4 (WBS) dan Bagian 5 (Linimasa). Centan
 
 > **[Usulan]** = tugas tambahan penyusun. Kode `OQ-xx` merujuk ke `prd.md`. Peran: **LA** = Lead Architect, **CE** = Compiler Engine Developer, **MA** = Map & Animation Developer, **UI** = UI & Text Editor Developer.
 
-> **Progress 10 November 2026:** fondasi minggu 1–3 sudah diimplementasikan. Verifikasi pada development build/emulator Android masih perlu dilakukan karena MapLibre memerlukan modul native.
+> **Progress 18 November 2026:** implementasi Minggu 4 dan development build Android selesai; 15 tes lulus. Aplikasi menjalankan entry point JavaScript, tetapi layar emulator tetap hitam, sehingga verifikasi keyboard, animasi/peta, dan mode offline belum dapat dilakukan.
 
 ---
 
@@ -19,8 +19,8 @@ Beberapa tugas tidak bisa selesai tanpa keputusan ini. Targetkan selesai sebelum
 - [x] OQ-02 Definisi LOC (ADR-03)
 - [x] OQ-01 Ambang bintang 1/2/3 (ADR-05)
 - [x] OQ-06 Satuan batas langkah (ADR-07)
-- [ ] OQ-07 Cakupan: apakah percabangan dan perulangan masuk versi ini
-- [ ] OQ-08 Jenjang pengguna dan jumlah level versi pertama
+- [x] OQ-07 Cakupan: percabangan dan perulangan termasuk v1 (ADR-09)
+- [x] OQ-08 Jenjang SMA kelas X; satu level per materi, total mengikuti daftar materi (ADR-09)
 
 ## Minggu 1 — Inisialisasi (WBS 1.0) · Target: arsitektur AST terkunci
 
@@ -30,7 +30,7 @@ Beberapa tugas tidak bisa selesai tanpa keputusan ini. Targetkan selesai sebelum
   - [x] **[Usulan]** Tipe hasil kompilasi (sukses atau error dengan `line` dan `message`)
 - [x] **[Usulan]** Konfigurasi TypeScript, lint, dan runner tes (Jest)
 - [x] **[Usulan]** Satu level contoh (`lvl_01`) dalam JSON sebagai data uji bersama
-- [ ] **[Usulan]** Lengkapi tanggal dan versi pada dokumen SRS/SDD/SPMP
+- [ ] **[Usulan]** Lengkapi tanggal dan versi pada dokumen SRS/SDD/SPMP (dokumen sumber belum tersedia di `.docs/`)
 
 ## Minggu 2 — Lexer dan Peta (WBS 2.1, 3.1) · Target: Lexer berfungsi, peta tampil
 
@@ -46,21 +46,24 @@ Beberapa tugas tidak bisa selesai tanpa keputusan ini. Targetkan selesai sebelum
   - [x] FR-06 AST → Trajectory Array
   - [x] FR-07 Deteksi CRASH
   - [x] FR-08 Batas langkah (batas statement)
-- [ ] **3.2** (MA) Animasi ikon motor antar koordinat (interpolasi) dan rotasi bearing (FR-09) — kode tersedia, menunggu verifikasi Android
+- [x] **3.2** (MA) Implementasi animasi ikon motor antar koordinat (interpolasi) dan rotasi bearing (FR-09)
+  - [ ] **[Usulan]** Verifikasi gerak dan rotasi di layar Android
 - [x] **4.1** (UI) `CodeEditor.tsx` dengan syntax highlighting dasar dan penomoran baris
   - [x] FR-01, FR-02 (LOC real-time)
 
 ## Minggu 4 — Keyboard dan Penilaian (WBS 4.2, 2.3) · Target: layout aman dari keyboard, bintang berfungsi
 
-- [ ] **4.2** (UI) Keyboard handler dan modal penampil Syntax Error
-  - [ ] FR-03 Layout menyesuaikan keyboard (peta tetap terlihat)
+- [x] **4.2** (UI) Keyboard handler dan modal penampil Syntax Error
+  - [x] FR-03 Implementasi layout menyesuaikan keyboard dan mempertahankan panel peta
+  - [ ] **[Usulan]** Verifikasi keyboard tidak menutupi peta pada emulator/perangkat
   - [ ] Verifikasi NFR-02 (tanpa UI freeze)
-- [ ] **2.3** (CE) Mesin penilai berbasis LOC (FR-10 sampai FR-12)
-- [ ] **[Usulan]** Penyimpanan progres dan draf (FR-13): bintang, status gembok, teks terakhir
-- [ ] **[Usulan]** Layar Daftar Level dengan status gembok
+- [x] **2.3** (CE) Mesin penilai berbasis LOC (FR-10 sampai FR-12)
+- [x] **[Usulan]** Penyimpanan progres dan draf (FR-13): bintang terbaik, status gembok, teks terakhir
+- [x] **[Usulan]** Layar Daftar Level dengan status gembok
 
 ## Minggu 5 — Integrasi, Pengujian, Distribusi (WBS 5.0) · Target: pengujian dan rilis APK
 
+- [ ] **[Tambahan ADR-09]** Tetapkan tata bahasa/kondisi loop, implementasikan percabangan dan perulangan pada compiler, lalu sediakan satu level per materi dengan tes unit.
 - [ ] **5.1** (Semua) Gabungkan Editor Teks, Kompilator, dan Peta dalam satu layar — layar awal sudah dirangkai; verifikasi native tertunda
 - [ ] **5.2** (Semua) Black-box testing: ketik teks asal untuk memeriksa validasi error
   - [ ] **[Usulan]** Ukur waktu kompilasi terhadap NFR-01 (≤ 100 ms)
@@ -70,9 +73,9 @@ Beberapa tugas tidak bisa selesai tanpa keputusan ini. Targetkan selesai sebelum
 
 ## Risiko yang Dipantau (SPMP)
 
-- [ ] Pesan error ramah dan jelas (risiko 1)
+- [x] Pesan error ramah dan jelas (risiko 1)
 - [ ] Keyboard tidak menutupi peta (risiko 2)
-- [ ] Batas 50 baris / 1000 karakter diberlakukan di editor (risiko 3)
+- [x] Batas 50 baris / 1000 karakter diberlakukan di editor (risiko 3)
 - [ ] **[Usulan]** Peta offline terbukti bekerja sebelum Minggu 3 (risiko 4)
 
 ## Definisi Selesai **[Usulan]**

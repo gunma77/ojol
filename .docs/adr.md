@@ -1,6 +1,6 @@
 # ADR — CodePath: Ojol Edition
 
-Catatan keputusan arsitektur dan desain, diambil pada sesi keputusan **10 November 2026**. Setiap ADR memuat konteks, opsi yang dipertimbangkan, keputusan, dan konsekuensi. Status semua ADR di bawah: **Diterima**.
+Catatan keputusan arsitektur dan desain. ADR-01–08 diterima pada **10 November 2026**; ADR-09 diterima pada **18 November 2026**. Setiap ADR memuat konteks, opsi yang dipertimbangkan, keputusan, dan konsekuensi.
 
 > Kode `OQ-xx` merujuk ke pertanyaan terbuka di `prd.md`. Nilai angka yang bertanda **(awal)** adalah titik mulai yang perlu diuji, bukan hasil perhitungan.
 
@@ -14,6 +14,7 @@ Catatan keputusan arsitektur dan desain, diambil pada sesi keputusan **10 Novemb
 | ADR-06 | Peta offline | OQ-05 |
 | ADR-07 | Batas eksekusi | OQ-06 |
 | ADR-08 | Skema data level | OQ-09 |
+| ADR-09 | Cakupan struktur kontrol dan jumlah level per materi | OQ-07, sebagian OQ-08 |
 
 ---
 
@@ -85,7 +86,7 @@ Catatan keputusan arsitektur dan desain, diambil pada sesi keputusan **10 Novemb
 
 **Keputusan.** Perintah dasar: `maju(n)`, `mundur(n)`, `belokKanan()`, `belokKiri()`, `putarBalik()`. Ketersediaannya dibatasi per level lewat `allowed_commands`.
 
-**Konsekuensi.** Level awal dapat hanya mengizinkan sebagian perintah. Daftar ini belum mencakup percabangan dan perulangan (OQ-07).
+**Konsekuensi.** Level awal dapat hanya mengizinkan sebagian perintah dasar. Struktur kontrol v1 ditetapkan terpisah di ADR-09 dan tidak menjadi anggota `allowed_commands`.
 
 ---
 
@@ -145,7 +146,7 @@ Catatan keputusan arsitektur dan desain, diambil pada sesi keputusan **10 Novemb
 - Argumen `n` hanya boleh 1–99; di luar itu menjadi kesalahan sintaks.
 - Jumlah pernyataan yang dieksekusi dibatasi (awal: 500, dapat diatur per level lewat `max_statements`); melebihinya menghentikan eksekusi.
 
-**Konsekuensi.** Tanpa perulangan (OQ-07), skrip paling panjang 50 baris sehingga batas pernyataan belum akan tercapai; ia menjadi relevan penuh begitu perulangan masuk. Nilai 500 perlu diuji.
+**Konsekuensi.** Dengan perulangan dalam cakupan v1 (ADR-09), batas 500 statement menjadi guard eksekusi yang relevan dan perlu diuji.
 
 ---
 
@@ -162,9 +163,16 @@ Catatan keputusan arsitektur dan desain, diambil pada sesi keputusan **10 Novemb
 
 **Konsekuensi.** Engine memakai graph level yang sama dengan GeoJSON yang digambar MapLibre. Level divalidasi sebelum dijalankan; arah jalan harus ditulis eksplisit.
 
-## Belum diputuskan
+## ADR-09 — Cakupan struktur kontrol dan jumlah level per materi
 
-| Kode | Isu |
-|---|---|
-| OQ-07 | Apakah versi ini mencakup percabangan dan perulangan |
-| OQ-08 | Jenjang pengguna dan jumlah level |
+**Konteks.** OQ-07 menanyakan apakah percabangan/perulangan masuk v1, sedangkan OQ-08 juga meminta jenjang dan jumlah level awal. Pada 18 November 2026, pengguna menetapkan struktur kontrol masuk v1, jenjang SMA kelas X, dan satu level per materi.
+
+**Keputusan.**
+- v1 mencakup percabangan dan perulangan.
+- Setiap materi pembelajaran memiliki satu level, termasuk materi percabangan dan perulangan.
+- Jenjang pengguna adalah siswa SMA kelas X.
+
+**Konsekuensi.**
+- Lexer, parser, AST, interpreter, batas eksekusi, dan tes perlu diperluas sebelum distribusi v1.
+- Sintaks final, kondisi/sensor yang tersedia, perilaku loop, dan daftar materi harus dirumuskan sebelum implementasi kontrol alur.
+- Jumlah level akhir mengikuti daftar materi; `lvl_01` saat ini tetap menjadi fixture awal.

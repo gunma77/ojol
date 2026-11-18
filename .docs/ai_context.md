@@ -12,7 +12,7 @@ Aplikasi mobile Android **offline-first** untuk melatih logika pemrograman. Sisw
 
 ## 2. Status
 
-Implementasi minggu 1–3 sedang berjalan: fondasi compiler, fixture level, editor, dan sinkronisasi trajectory ke peta sudah tersedia. Verifikasi native MapLibre perlu development build Android.
+Fondasi compiler, fixture level, editor, peta/animasi, penilaian LOC, progres lokal, dan daftar level telah tersedia. Development build Android berhasil dibuat; verifikasi tampilan peta/animasi, keyboard, dan operasi offline masih memerlukan pengecekan manual.
 
 ## 3. Tech Stack
 
@@ -21,7 +21,7 @@ Implementasi minggu 1–3 sedang berjalan: fondasi compiler, fixture level, edit
 | Framework | React Native (Expo), TypeScript |
 | Peta | MapLibre React Native (ADR-06, offline tanpa basemap) |
 | Animasi | Reanimated |
-| State | Zustand |
+| State | React state |
 | Persistensi | AsyncStorage |
 | Build | EAS Build (`.apk`) |
 | Platform | Android ≥ 8.0 |
@@ -30,7 +30,7 @@ Implementasi minggu 1–3 sedang berjalan: fondasi compiler, fixture level, edit
 
 1. **Presentation Layer**: komponen React Native, peta, editor teks (`TextInput` multiline + overlay highlighting).
 2. **Compiler Engine Layer**: TypeScript murni. `lexer.ts` → `parser.ts` → `interpreter.ts`.
-3. **State & Persistence Layer**: Zustand + AsyncStorage (draf skrip, bintang, status level).
+3. **State & Persistence Layer**: React state + AsyncStorage (draf skrip, bintang, status level).
 
 Alur data:
 
@@ -48,7 +48,7 @@ src/
 ├─ engine/
 │  └─ compiler/         # lexer.ts, parser.ts, interpreter.ts (dari SDD)
 ├─ components/map/      # MapLibre + animasi motor
-├─ store/               # [Usulan] Zustand
+├─ store/               # AsyncStorage untuk progres dan draf
 ├─ data/levels/         # JSON level
 └─ types/               # [Usulan] Token, AST, TrajectoryStep
 ```
@@ -85,7 +85,7 @@ belokKanan()
 
 - Perintah dasar: `maju(n)`, `mundur(n)`, `belokKanan()`, `belokKiri()`, `putarBalik()`; level membatasi lewat `allowed_commands`.
 - Sintaks: satu perintah per baris, titik koma opsional, argumen gerak wajib 1–99, komentar `#`, nama camelCase yang case-sensitive (ADR-02/04).
-- Percabangan dan perulangan **[Belum diputuskan — OQ-07]**; lihat usulan di `technical.md` Bagian 5.
+- Percabangan dan perulangan masuk cakupan v1 (ADR-09), tetapi sintaks final, kondisi/sensor, dan batas loop harus disepakati sebelum implementasi compiler.
 
 ## 8. Aturan Kerja untuk AI
 
@@ -134,7 +134,7 @@ npm test                  # tes unit engine
 
 ## 11. Pertanyaan Terbuka yang Mempengaruhi Kode
 
-OQ-07 percabangan/perulangan dan OQ-08 jenjang/jumlah level masih terbuka. OQ-01 sampai OQ-06 dan OQ-09 telah diputuskan dalam `adr.md`.
+OQ-07 diputuskan masuk v1 di ADR-09. OQ-08 diputuskan: SMA kelas X dan satu level per materi; jumlah akhir mengikuti daftar materi. OQ-01 sampai OQ-06 dan OQ-09 telah diputuskan dalam `adr.md`.
 
 ## 12. Dokumen Terkait
 

@@ -24,3 +24,5 @@ export const level01: LevelData = {
   allowed_commands: allowedCommands,
   nodes,
 };
+
+export const levels: LevelData[] = [level01];

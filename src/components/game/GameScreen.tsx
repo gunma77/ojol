@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   StyleSheet,
@@ -10,25 +11,51 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { level01 } from '@/data/levels';
+import { levels } from '@/data/levels';
 import { compileProgram } from '@/engine/compiler/compile';
+import type { LevelData } from '@/engine/compiler/types';
+import { scoreResult } from '@/engine/scoring';
+import type { StarRating } from '@/engine/scoring';
 
 import { CodeEditor } from '../editor/CodeEditor';
 import { RoadMap } from '../map/RoadMap';
 
-const level = level01;
-const initialScript = 'maju(2)\nbelokKanan()\nmaju(1)';
 const animationDuration = 520;
 
-export function GameScreen() {
-  const [script, setScript] = useState(initialScript);
+interface GameScreenProps {
+  level: LevelData;
+  initialScript?: string;
+  savedStars: StarRating;
+  persistenceError: string | null;
+  onBackToLevels: () => void;
+  onComplete: (levelId: string, stars: 1 | 2 | 3) => void;
+  onDraftChange: (levelId: string, draft: string) => void;
+}
+
+export function GameScreen({
+  level,
+  initialScript,
+  savedStars,
+  persistenceError,
+  onBackToLevels,
+  onComplete,
+  onDraftChange,
+}: GameScreenProps) {
+  const [script, setScript] = useState(initialScript ?? 'maju(2)\nbelokKanan()\nmaju(1)');
   const [coordinate, setCoordinate] = useState<[number, number]>(level.nodes[level.start.node]);
   const [bearing, setBearing] = useState(level.start.bearing);
   const [errorLine, setErrorLine] = useState<number | null>(null);
+  const [syntaxError, setSyntaxError] = useState<{ line: number; message: string } | null>(null);
   const [outcome, setOutcome] = useState('Tulis skrip, lalu jalankan untuk mengantar motor.');
   const [running, setRunning] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [runSequence, setRunSequence] = useState(0);
+  const levelNumber = levels.findIndex((entry) => entry.level_id === level.level_id) + 1;
+
+  useEffect(() => {
+    const timer = setTimeout(() => onDraftChange(level.level_id, script), 350);
+    return () => clearTimeout(timer);
+  }, [level.level_id, onDraftChange, script]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
@@ -50,6 +77,7 @@ export function GameScreen() {
 
     setRunning(true);
     setErrorLine(null);
+    setSyntaxError(null);
     setOutcome('Memeriksa skrip…');
     setCoordinate(level.nodes[level.start.node]);
     setBearing(level.start.bearing);
@@ -62,8 +90,15 @@ export function GameScreen() {
     if (!result.ok) {
       setErrorLine(result.error.line > 0 ? result.error.line : null);
       setOutcome(`${result.error.message} (${compileTime.toFixed(1)} ms)`);
+      setSyntaxError({ line: result.error.line, message: result.error.message });
+      Keyboard.dismiss();
       setRunning(false);
       return;
+    }
+
+    const stars = scoreResult(result, level);
+    if (stars !== 0) {
+      onComplete(level.level_id, stars);
     }
 
     for (const step of result.trajectory) {
@@ -82,7 +117,9 @@ export function GameScreen() {
     if (result.crashed) {
       setOutcome(`CRASH di simpang ${result.finalNode}. Periksa perintah pada baris ${result.trajectory.at(-1)?.line ?? 1}.`);
     } else if (result.reachedGoal) {
-      setOutcome(`Tujuan tercapai! Kompilasi ${compileTime.toFixed(1)} ms · ${result.loc} LOC.`);
+      setOutcome(
+        `Tujuan tercapai! ${stars} bintang · terbaik ${Math.max(savedStars, stars)}/3 · ${compileTime.toFixed(1)} ms · ${result.loc} LOC.`,
+      );
     } else {
       setOutcome(`Motor berhenti di simpang ${result.finalNode}, belum sampai tujuan.`);
     }
@@ -97,9 +134,18 @@ export function GameScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.eyebrow}>CODEPATH · OJOL EDITION</Text>
-            <Text style={styles.title}>Level 1: {level.title}</Text>
+            <Text style={styles.title}>Level {levelNumber}: {level.title}</Text>
           </View>
-          <Text style={styles.levelTag}>01</Text>
+          <Pressable
+            accessibilityRole="button"
+            disabled={running}
+            onPress={() => {
+              Keyboard.dismiss();
+              onBackToLevels();
+            }}
+            style={styles.levelTag}>
+            <Text style={styles.levelTagText}>Daftar level</Text>
+          </Pressable>
         </View>
 
         <View style={[styles.mapPanel, { flex: keyboardVisible ? 2 : 3 }]}>
@@ -119,6 +165,11 @@ export function GameScreen() {
             <Text style={styles.sectionTitle}>Skrip perjalanan</Text>
             <Text style={styles.commandHint}>maju · belokKanan · belokKiri · putarBalik · mundur</Text>
           </View>
+          {persistenceError && (
+            <Text accessibilityLiveRegion="polite" style={styles.persistenceError}>
+              {persistenceError}
+            </Text>
+          )}
           <CodeEditor
             value={script}
             onChangeText={setScript}
@@ -143,6 +194,27 @@ export function GameScreen() {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setSyntaxError(null)}
+        transparent
+        visible={syntaxError !== null}>
+        <View style={styles.modalBackdrop}>
+          <View accessibilityRole="alert" style={styles.errorModal}>
+            <Text style={styles.errorTitle}>Syntax Error</Text>
+            <Text style={styles.errorLineText}>
+              {syntaxError?.line ? `Baris ${syntaxError.line}` : 'Data skrip'}
+            </Text>
+            <Text style={styles.errorMessage}>{syntaxError?.message}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setSyntaxError(null)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Perbaiki skrip</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -155,7 +227,7 @@ const styles = StyleSheet.create({
   keyboardAvoider: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 4,
   },
   header: {
     minHeight: 62,
@@ -177,16 +249,19 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   levelTag: {
-    overflow: 'hidden',
+    minHeight: 40,
+    justifyContent: 'center',
     borderRadius: 12,
     paddingHorizontal: 11,
     paddingVertical: 6,
-    color: '#38634d',
     backgroundColor: '#e2eee6',
+  },
+  levelTagText: {
+    color: '#38634d',
     fontWeight: '800',
   },
   mapPanel: {
-    minHeight: 115,
+    minHeight: 80,
     overflow: 'hidden',
     borderRadius: 18,
     borderWidth: 1,
@@ -209,9 +284,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   editorPanel: {
-    minHeight: 220,
+    minHeight: 0,
+    flexShrink: 1,
     gap: 8,
     paddingTop: 13,
+  },
+  persistenceError: {
+    color: '#a32020',
+    fontSize: 11,
   },
   sectionHeader: {
     gap: 3,
@@ -226,7 +306,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   outcome: {
-    minHeight: 34,
+    minHeight: 24,
     color: '#435148',
     fontSize: 12,
     lineHeight: 17,
@@ -247,6 +327,46 @@ const styles = StyleSheet.create({
   runButtonText: {
     color: '#ffffff',
     fontSize: 15,
+    fontWeight: '800',
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#10251dcc',
+  },
+  errorModal: {
+    gap: 10,
+    padding: 20,
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
+  },
+  errorTitle: {
+    color: '#a32020',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  errorLineText: {
+    color: '#59665f',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  errorMessage: {
+    color: '#263238',
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  closeButton: {
+    minHeight: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    borderRadius: 12,
+    backgroundColor: '#177245',
+  },
+  closeButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
     fontWeight: '800',
   },
 });

@@ -26,7 +26,7 @@ Dokumen sumber tidak memuat latar belakang secara eksplisit. **[Usulan]** rumusa
 
 | Pengguna | Keterangan |
 |---|---|
-| Siswa | Pengguna utama. Menulis skrip, menjalankan, mendapat bintang. **[Belum diputuskan — OQ-08]** jenjang dan jumlah level; arah diskusi perancangan: siswa SMA kelas X. |
+| Siswa | Pengguna utama. Menulis skrip, menjalankan, mendapat bintang. Target: siswa SMA kelas X (ADR-09). Jumlah level: satu per materi; total mengikuti daftar materi yang disusun. |
 
 Peran guru/dasbor tidak ada di dokumen sumber (lihat Bagian 5, di luar cakupan).
 
@@ -58,6 +58,7 @@ Peran guru/dasbor tidak ada di dokumen sumber (lihat Bagian 5, di luar cakupan).
 - Deteksi dan penampilan Syntax Error
 - Penilaian bintang 0–3 berdasarkan LOC
 - Penyimpanan progres, bintang, dan draf skrip secara lokal
+- Percabangan dan perulangan; satu level untuk setiap materi pembelajaran (ADR-09)
 
 **Di luar cakupan**
 
@@ -65,7 +66,6 @@ Peran guru/dasbor tidak ada di dokumen sumber (lihat Bagian 5, di luar cakupan).
 - Platform iOS (SRS: Android minimal 8.0)
 - Editor blok *drag-and-drop* (digantikan editor teks pada v2.0)
 - Dasbor guru
-- Struktur kontrol (percabangan dan perulangan): tidak tercantum di dokumen sumber. **[Belum diputuskan — OQ-07]**
 
 ## 6. Fitur dan User Story
 
@@ -133,7 +133,7 @@ Peran guru/dasbor tidak ada di dokumen sumber (lihat Bagian 5, di luar cakupan).
 
 ## 11. Pertanyaan Terbuka
 
-Status keputusan: OQ-01 sampai OQ-06 diselesaikan oleh ADR-01 sampai ADR-07; OQ-09 diselesaikan oleh ADR-08. Pertanyaan yang masih terbuka: OQ-07 dan OQ-08.
+Status keputusan: OQ-01 sampai OQ-09 telah diputuskan; OQ-07 dan aturan jenjang/jumlah pada OQ-08 diselesaikan di ADR-09. Daftar materi menjadi pekerjaan perencanaan konten.
 
 | Kode | Pertanyaan | Status |
 |---|---|---|
@@ -143,8 +143,8 @@ Status keputusan: OQ-01 sampai OQ-06 diselesaikan oleh ADR-01 sampai ADR-07; OQ-
 | OQ-04 | Semantik `belok_kanan` dan model jalur (graf persimpangan?) yang mendasari CRASH. | Diputuskan di ADR-01 |
 | OQ-05 | Strategi peta offline dan pustaka peta (MapLibre atau react-native-maps). | Diputuskan di ADR-06 |
 | OQ-06 | Satuan "100 langkah eksekusi" pada FR-08: langkah trajectory atau operasi interpreter? | Diputuskan di ADR-07 |
-| OQ-07 | Apakah versi ini mencakup percabangan dan perulangan? Dokumen sumber hanya memuat `maju` dan `belok_kanan`. | Belum diputuskan |
-| OQ-08 | Jenjang pengguna dan jumlah level versi pertama. | Belum diputuskan |
+| OQ-07 | Apakah versi ini mencakup percabangan dan perulangan? Dokumen sumber hanya memuat `maju` dan `belok_kanan`. | Diputuskan: termasuk v1 (ADR-09) |
+| OQ-08 | Jenjang siswa dan jumlah level versi pertama. | SMA kelas X; satu level per materi, total mengikuti daftar materi (ADR-09) |
 | OQ-09 | Skema JSON level yang lengkap (simpul, sisi, titik awal, tujuan). | Diputuskan di ADR-08 |
 
 ## 12. Tim dan Peran (dari SPMP)
