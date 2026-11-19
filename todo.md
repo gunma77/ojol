@@ -63,9 +63,9 @@ Beberapa tugas tidak bisa selesai tanpa keputusan ini. Targetkan selesai sebelum
 
 ## Minggu 5 — Integrasi, Pengujian, Distribusi (WBS 5.0) · Target: pengujian dan rilis APK
 
-- [ ] **[Tambahan ADR-09]** Tetapkan tata bahasa/kondisi loop, implementasikan percabangan dan perulangan pada compiler, lalu sediakan satu level per materi dengan tes unit.
-- [ ] **5.1** (Semua) Gabungkan Editor Teks, Kompilator, dan Peta dalam satu layar — layar awal sudah dirangkai; verifikasi native tertunda
-- [ ] **5.2** (Semua) Black-box testing: ketik teks asal untuk memeriksa validasi error
+- [x] **[Tambahan ADR-09]** Tetapkan tata bahasa/kondisi loop, implementasikan percabangan dan perulangan pada compiler, lalu sediakan satu level per materi dengan tes unit.
+- [x] **5.1** (Semua) Gabungkan Editor Teks, Kompilator, dan Peta dalam satu layar — layar awal sudah dirangkai; verifikasi native tertunda
+- [x] **5.2** (Semua) Black-box testing: ketik teks asal untuk memeriksa validasi error
   - [ ] **[Usulan]** Ukur waktu kompilasi terhadap NFR-01 (≤ 100 ms)
   - [ ] **[Usulan]** Uji pada perangkat Android fisik (versi 8.0 ke atas)
   - [ ] **[Usulan]** Uji coba dengan beberapa siswa dan catat titik macet

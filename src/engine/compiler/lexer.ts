@@ -1,4 +1,4 @@
-import { EngineError, type Token } from './types';
+import { EngineError, KEYWORDS, CONDITIONS, type Token, type Keyword, type Condition } from './types';
 
 const punctuation = new Set(['(', ')', ';']);
 
@@ -29,16 +29,35 @@ export function tokenize(source: string): Token[] {
       continue;
     }
 
+    if (character === '{') {
+      tokens.push({ type: 'LBRACE', value: character, line });
+      index += 1;
+      continue;
+    }
+
+    if (character === '}') {
+      tokens.push({ type: 'RBRACE', value: character, line });
+      index += 1;
+      continue;
+    }
+
     if (/[A-Za-z_]/.test(character)) {
       const start = index;
       while (index < source.length && /[A-Za-z0-9_]/.test(source[index])) {
         index += 1;
       }
-      tokens.push({
-        type: 'IDENTIFIER',
-        value: source.slice(start, index),
-        line,
-      });
+      const value = source.slice(start, index);
+      if ((KEYWORDS as readonly string[]).includes(value)) {
+        tokens.push({ type: 'KEYWORD', value, line });
+      } else if ((CONDITIONS as readonly string[]).includes(value)) {
+        tokens.push({ type: 'CONDITION', value, line });
+      } else {
+        tokens.push({
+          type: 'IDENTIFIER',
+          value,
+          line,
+        });
+      }
       continue;
     }
 

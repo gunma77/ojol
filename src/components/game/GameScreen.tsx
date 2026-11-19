@@ -14,8 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { levels } from '@/data/levels';
 import { compileProgram } from '@/engine/compiler/compile';
 import type { LevelData } from '@/engine/compiler/types';
-import { scoreResult } from '@/engine/scoring';
 import type { StarRating } from '@/engine/scoring';
+import { scoreResult } from '@/engine/scoring';
 
 import { CodeEditor } from '../editor/CodeEditor';
 import { RoadMap } from '../map/RoadMap';
@@ -156,7 +156,7 @@ export function GameScreen({
             runSequence={runSequence}
           />
           <View style={styles.mapBadge}>
-            <Text style={styles.mapBadgeText}>PETA OFFLINE · BANDUNG</Text>
+            <Text style={styles.mapBadgeText}>PETA OFFLEN · BANDUNG</Text>
           </View>
         </View>
 

@@ -8,7 +8,27 @@ export const COMMAND_NAMES = [
 
 export type CommandName = (typeof COMMAND_NAMES)[number];
 
-export type TokenType = 'IDENTIFIER' | 'NUMBER' | 'PUNCTUATION' | 'NEWLINE' | 'EOF';
+export const KEYWORDS = ['jika', 'jikaTidak', 'ulang', 'selama'] as const;
+export type Keyword = (typeof KEYWORDS)[number];
+
+export const CONDITIONS = [
+  'adaJalanDiDepan',
+  'adaJalanDiKiri',
+  'adaJalanDiKanan',
+  'diTujuan',
+] as const;
+export type Condition = (typeof CONDITIONS)[number];
+
+export type TokenType =
+  | 'IDENTIFIER'
+  | 'NUMBER'
+  | 'PUNCTUATION'
+  | 'NEWLINE'
+  | 'LBRACE'
+  | 'RBRACE'
+  | 'KEYWORD'
+  | 'CONDITION'
+  | 'EOF';
 
 export interface Token {
   type: TokenType;
@@ -23,9 +43,33 @@ export interface CallExpression {
   line: number;
 }
 
+export interface IfStatement {
+  type: 'IfStatement';
+  condition: Condition;
+  consequent: Statement[];
+  alternate?: Statement[];
+  line: number;
+}
+
+export interface RepeatStatement {
+  type: 'RepeatStatement';
+  count: number;
+  body: Statement[];
+  line: number;
+}
+
+export interface WhileStatement {
+  type: 'WhileStatement';
+  condition: Condition;
+  body: Statement[];
+  line: number;
+}
+
+export type Statement = CallExpression | IfStatement | RepeatStatement | WhileStatement;
+
 export interface Program {
   type: 'Program';
-  body: CallExpression[];
+  body: Statement[];
 }
 
 export interface RoadEdge {

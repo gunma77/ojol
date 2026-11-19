@@ -140,7 +140,7 @@ export function RoadMap({ level, coordinate, bearing, runSequence }: RoadMapProp
         <Layer
           id="road-lines"
           type="line"
-          paint={{ 'line-color': '#80908b', 'line-width': 5, 'line-opacity': 0.82 }}
+              paint={{ 'line-color': '#80908b', 'line-width': 5, 'line-opacity': 0.82 }}
         />
       </GeoJSONSource>
       <GeoJSONSource id="level-intersections" data={intersections}>

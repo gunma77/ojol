@@ -1,0 +1,26 @@
+{
+  "level_id": "lvl_04",
+  "title": "Percabangan Lanjut",
+  "allowed_commands": ["maju", "belokKanan", "belokKiri"],
+  "optimal_loc": 6,
+  "start": {
+    "node": "A",
+    "bearing": 90
+  },
+  "goal": "F",
+  "nodes": {
+    "A": [107.607, -6.9215],
+    "B": [107.608, -6.9215],
+    "C": [107.608, -6.9205],
+    "D": [107.608, -6.9225],
+    "E": [107.609, -6.9205],
+    "F": [107.609, -6.9225]
+  },
+  "edges": [
+    { "from": "A", "to": "B", "bearing": 90 },
+    { "from": "B", "to": "C", "bearing": 0 },
+    { "from": "C", "to": "E", "bearing": 90 },
+    { "from": "B", "to": "D", "bearing": 180 },
+    { "from": "D", "to": "F", "bearing": 90 }
+  ]
+}

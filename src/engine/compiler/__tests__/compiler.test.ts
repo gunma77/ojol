@@ -100,4 +100,47 @@ describe('compiler engine', () => {
     expect(result.ok).toBe(true);
     expect(performance.now() - startedAt).toBeLessThan(100);
   });
+
+  it('executes repeat block (ulang) and if block (jika)', () => {
+    // A -> B -> C -> D by repeating maju(1) then belokKanan()
+    // actually, in level01 A->B is 90. B->C is 90. C->D is 180.
+    // Let's use level05 where A->B is 90, B->C is 90, C->D is 90.
+    const level05 = {
+      level_id: 'lvl_05',
+      title: 'Perulangan Pasti (ulang)',
+      allowed_commands: ['maju', 'belokKanan', 'belokKiri'] as any,
+      optimal_loc: 4,
+      start: { node: 'A', bearing: 90 },
+      goal: 'D',
+      nodes: {
+        A: [107.607, -6.9215] as [number, number],
+        B: [107.608, -6.9215] as [number, number],
+        C: [107.609, -6.9215] as [number, number],
+        D: [107.610, -6.9215] as [number, number],
+      },
+      edges: [
+        { from: 'A', to: 'B', bearing: 90 },
+        { from: 'B', to: 'C', bearing: 90 },
+        { from: 'C', to: 'D', bearing: 90 },
+      ],
+    };
+    const result = compileProgram('ulang(3) {\n maju(1)\n}', level05);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.reachedGoal).toBe(true);
+    expect(result.finalNode).toBe('D');
+  });
+
+  it('prevents infinite loops during execution', () => {
+    const script = 'selama(adaJalanDiDepan) {\n belokKanan()\n belokKiri()\n}';
+    const result = compileProgram(script, level01);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe('E07');
+    }
+  });
 });
