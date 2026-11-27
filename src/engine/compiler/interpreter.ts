@@ -29,11 +29,16 @@ export function interpret(program: Program, level: LevelData) {
   let statementsExecuted = 0;
   const trajectory: TrajectoryStep[] = [];
 
-  const addStep = (action: TrajectoryStep['action'], line: number) => {
+  const addStep = (
+    action: TrajectoryStep['action'],
+    line: number,
+    geometry?: [number, number][],
+  ) => {
     trajectory.push({
       stepIndex: trajectory.length,
       action,
       coordinate: level.nodes[nodeId],
+      geometry,
       bearing,
       nodeId,
       line,
@@ -114,8 +119,9 @@ export function interpret(program: Program, level: LevelData) {
           break;
         }
 
-        nodeId = candidates[0].edge.to;
-        addStep('MOVE', statement.line);
+        const edge = candidates[0].edge;
+        nodeId = edge.to;
+        addStep('MOVE', statement.line, edge.geometry);
       }
     } else if (statement.type === 'IfStatement') {
       if (checkCondition(statement.condition)) {

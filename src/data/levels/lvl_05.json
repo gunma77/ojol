@@ -1,22 +1,56 @@
 {
   "level_id": "lvl_05",
-  "title": "Perulangan Pasti (ulang)",
+  "title": "Perulangan di Jalan Braga",
+  "mission": "Gunakan ulang untuk melewati tiga ruas Jalan Braga ke arah utara.",
+  "start_label": "Jalan Braga (selatan)",
+  "goal_label": "Jalan Braga (utara)",
   "allowed_commands": ["maju", "belokKanan", "belokKiri"],
   "optimal_loc": 4,
   "start": {
     "node": "A",
-    "bearing": 90
+    "bearing": 0
   },
   "goal": "D",
   "nodes": {
-    "A": [107.607, -6.9215],
-    "B": [107.608, -6.9215],
-    "C": [107.609, -6.9215],
-    "D": [107.610, -6.9215]
+    "A": [107.6099747, -6.9197157],
+    "B": [107.6096319, -6.9185764],
+    "C": [107.60945, -6.917904],
+    "D": [107.6093197, -6.9174272]
   },
   "edges": [
-    { "from": "A", "to": "B", "bearing": 90 },
-    { "from": "B", "to": "C", "bearing": 90 },
-    { "from": "C", "to": "D", "bearing": 90 }
+    {
+      "from": "A",
+      "to": "B",
+      "bearing": 0,
+      "name": "Jalan Braga",
+      "geometry": [
+        [107.6099747, -6.9197157],
+        [107.6099352, -6.9195836],
+        [107.6096319, -6.9185764]
+      ]
+    },
+    {
+      "from": "B",
+      "to": "C",
+      "bearing": 0,
+      "name": "Jalan Braga",
+      "geometry": [
+        [107.6096319, -6.9185764],
+        [107.6095077, -6.9181188],
+        [107.60945, -6.917904]
+      ]
+    },
+    {
+      "from": "C",
+      "to": "D",
+      "bearing": 0,
+      "name": "Jalan Braga",
+      "geometry": [
+        [107.60945, -6.917904],
+        [107.6094304, -6.9178369],
+        [107.6094071, -6.9177472],
+        [107.6093197, -6.9174272]
+      ]
+    }
   ]
 }

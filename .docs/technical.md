@@ -259,7 +259,7 @@ Level dapat menetapkan `star_thresholds.three` dan `star_thresholds.two`; jika t
 - Animator memutar `TrajectoryStep[]` secara berurutan: interpolasi posisi dengan Reanimated dan rotasi sesuai `bearing` (FR-09).
 - Animasi hanya memutar hasil; tidak menjalankan logika kompilator.
 
-**Peta offline (ADR-06).** MapLibre menggambar edge, simpul, dan motor dari data level di atas latar polos. Tidak ada basemap atau permintaan jaringan pada versi pertama. MapLibre Native memerlukan development build; Expo Go tidak menyediakan modul tersebut.
+**Peta offline (ADR-06).** MapLibre menggambar jaringan jalan pusat Bandung dari extract GeoJSON OpenStreetMap lokal, lalu menumpuk rute, simpul, label tempat, dan motor. Geometri setiap edge dipakai bersama oleh renderer dan interpreter agar animasi mengikuti ruas jalan. Tidak ada permintaan jaringan saat runtime; tautan atribusi OSM tampil pada peta. MapLibre Native memerlukan development build; Expo Go tidak menyediakan modul tersebut.
 
 ## 10. State dan Persistensi
 

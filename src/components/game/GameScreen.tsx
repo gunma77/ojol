@@ -17,10 +17,12 @@ import type { LevelData } from '@/engine/compiler/types';
 import type { StarRating } from '@/engine/scoring';
 import { scoreResult } from '@/engine/scoring';
 
+import { ExternalLink } from '../external-link';
 import { CodeEditor } from '../editor/CodeEditor';
 import { RoadMap } from '../map/RoadMap';
 
 const animationDuration = 520;
+const previousLevelOneDefault = 'maju(2)\nbelokKanan()\nmaju(1)';
 
 interface GameScreenProps {
   level: LevelData;
@@ -41,11 +43,23 @@ export function GameScreen({
   onComplete,
   onDraftChange,
 }: GameScreenProps) {
-  const [script, setScript] = useState(initialScript ?? 'maju(2)\nbelokKanan()\nmaju(1)');
+  const [script, setScript] = useState(
+    level.level_id === 'lvl_01' && initialScript === previousLevelOneDefault
+      ? 'maju(1)'
+      : initialScript ?? 'maju(1)',
+  );
   const [coordinate, setCoordinate] = useState<[number, number]>(level.nodes[level.start.node]);
   const [bearing, setBearing] = useState(level.start.bearing);
+  const [movementPath, setMovementPath] = useState<[number, number][] | null>(null);
   const [errorLine, setErrorLine] = useState<number | null>(null);
   const [syntaxError, setSyntaxError] = useState<{ line: number; message: string } | null>(null);
+  const [scoreModal, setScoreModal] = useState<{
+    stars: 1 | 2 | 3;
+    bestStars: StarRating;
+    compileTime: number;
+    loc: number;
+  } | null>(null);
+  const [stoppedModal, setStoppedModal] = useState<string | null>(null);
   const [outcome, setOutcome] = useState('Tulis skrip, lalu jalankan untuk mengantar motor.');
   const [running, setRunning] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -81,6 +95,7 @@ export function GameScreen({
     setOutcome('Memeriksa skrip…');
     setCoordinate(level.nodes[level.start.node]);
     setBearing(level.start.bearing);
+    setMovementPath(null);
     setRunSequence((sequence) => sequence + 1);
 
     const startedAt = performance.now();
@@ -108,20 +123,29 @@ export function GameScreen({
       }
       if (step.action === 'MOVE') {
         setCoordinate(step.coordinate);
+        setMovementPath(step.geometry ?? [step.coordinate]);
         await waitForAnimation(animationDuration);
       } else {
+        setMovementPath(null);
         await waitForAnimation(300);
       }
     }
 
     if (result.crashed) {
-      setOutcome(`CRASH di simpang ${result.finalNode}. Periksa perintah pada baris ${result.trajectory.at(-1)?.line ?? 1}.`);
-    } else if (result.reachedGoal) {
-      setOutcome(
-        `Tujuan tercapai! ${stars} bintang · terbaik ${Math.max(savedStars, stars)}/3 · ${compileTime.toFixed(1)} ms · ${result.loc} LOC.`,
-      );
+      setOutcome(`CRASH di titik ${result.finalNode}. Periksa perintah pada baris ${result.trajectory.at(-1)?.line ?? 1}.`);
+    } else if (result.reachedGoal && stars !== 0) {
+      Keyboard.dismiss();
+      setOutcome('');
+      setScoreModal({
+        stars,
+        bestStars: savedStars > stars ? savedStars : stars,
+        compileTime,
+        loc: result.loc,
+      });
     } else {
-      setOutcome(`Motor berhenti di simpang ${result.finalNode}, belum sampai tujuan.`);
+      Keyboard.dismiss();
+      setOutcome('');
+      setStoppedModal(`Motor berhenti di simpang ${result.finalNode}, belum sampai tujuan.`);
     }
     setRunning(false);
   };
@@ -135,6 +159,9 @@ export function GameScreen({
           <View>
             <Text style={styles.eyebrow}>CODEPATH · OJOL EDITION</Text>
             <Text style={styles.title}>Level {levelNumber}: {level.title}</Text>
+            <Text numberOfLines={2} style={styles.missionText}>
+              {level.mission}
+            </Text>
           </View>
           <Pressable
             accessibilityRole="button"
@@ -153,10 +180,16 @@ export function GameScreen({
             level={level}
             coordinate={coordinate}
             bearing={bearing}
+            movementPath={movementPath}
             runSequence={runSequence}
           />
           <View style={styles.mapBadge}>
-            <Text style={styles.mapBadgeText}>PETA OFFLEN · BANDUNG</Text>
+            <Text style={styles.mapBadgeText}>PETA BANDUNG · DATA OFFLINE</Text>
+            <ExternalLink
+              href="https://www.openstreetmap.org/copyright"
+              style={styles.mapAttribution}>
+              © OpenStreetMap contributors
+            </ExternalLink>
           </View>
         </View>
 
@@ -176,9 +209,11 @@ export function GameScreen({
             errorLine={errorLine}
             editable={!running}
           />
-          <Text accessibilityLiveRegion="polite" style={styles.outcome}>
-            {outcome}
-          </Text>
+          {outcome.length > 0 && (
+            <Text accessibilityLiveRegion="polite" style={styles.outcome}>
+              {outcome}
+            </Text>
+          )}
           <Pressable
             accessibilityRole="button"
             disabled={running}
@@ -211,6 +246,74 @@ export function GameScreen({
               onPress={() => setSyntaxError(null)}
               style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Perbaiki skrip</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setStoppedModal(null)}
+        transparent
+        visible={stoppedModal !== null}>
+        <View style={styles.modalBackdrop}>
+          <View accessibilityRole="alert" style={styles.scoreModal}>
+            <Text style={styles.scoreTitle}>Belum sampai tujuan</Text>
+            <Text style={styles.stoppedMessage}>{stoppedModal}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setStoppedModal(null)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Kembali mengedit</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setStoppedModal(null);
+                Keyboard.dismiss();
+                onBackToLevels();
+              }}
+              style={styles.levelsButton}>
+              <Text style={styles.levelsButtonText}>Daftar level</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setScoreModal(null)}
+        transparent
+        visible={scoreModal !== null}>
+        <View style={styles.modalBackdrop}>
+          <View accessibilityRole="alert" style={styles.scoreModal}>
+            <Text style={styles.scoreTitle}>Tujuan tercapai!</Text>
+            <Text
+              accessibilityLabel={`${scoreModal?.stars ?? 0} dari 3 bintang`}
+              style={styles.scoreStars}>
+              {Array.from({ length: 3 }, (_, index) =>
+                index < (scoreModal?.stars ?? 0) ? '★' : '☆',
+              ).join(' ')}
+            </Text>
+            <Text style={styles.scoreSummary}>
+              Bintang terbaik: {scoreModal?.bestStars ?? 0}/3
+            </Text>
+            <Text style={styles.scoreDetails}>
+              {scoreModal?.compileTime.toFixed(1)} ms · {scoreModal?.loc} LOC
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setScoreModal(null)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Kembali mengedit</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setScoreModal(null);
+                Keyboard.dismiss();
+                onBackToLevels();
+              }}
+              style={styles.levelsButton}>
+              <Text style={styles.levelsButtonText}>Daftar level</Text>
             </Pressable>
           </View>
         </View>
@@ -248,6 +351,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
   },
+  missionText: {
+    maxWidth: 250,
+    marginTop: 3,
+    color: '#617269',
+    fontSize: 10,
+    lineHeight: 14,
+  },
   levelTag: {
     minHeight: 40,
     justifyContent: 'center',
@@ -272,6 +382,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     top: 10,
+    gap: 3,
     paddingHorizontal: 9,
     paddingVertical: 5,
     borderRadius: 10,
@@ -282,6 +393,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.6,
+  },
+  mapAttribution: {
+    color: '#59665f',
+    fontSize: 9,
+    fontWeight: '600',
   },
   editorPanel: {
     minHeight: 0,
@@ -341,6 +457,40 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: '#ffffff',
   },
+  scoreModal: {
+    alignItems: 'center',
+    gap: 10,
+    padding: 24,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+  },
+  scoreTitle: {
+    color: '#1e2b24',
+    fontSize: 22,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  scoreStars: {
+    color: '#f0a000',
+    fontSize: 38,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
+  scoreSummary: {
+    color: '#38634d',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  scoreDetails: {
+    color: '#69766e',
+    fontSize: 12,
+  },
+  stoppedMessage: {
+    color: '#435148',
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
   errorTitle: {
     color: '#a32020',
     fontSize: 20,
@@ -361,11 +511,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 4,
+    paddingHorizontal: 16,
     borderRadius: 12,
     backgroundColor: '#177245',
   },
   closeButtonText: {
     color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  levelsButton: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  levelsButtonText: {
+    color: '#38634d',
     fontSize: 14,
     fontWeight: '800',
   },

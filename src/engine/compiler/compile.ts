@@ -53,6 +53,21 @@ function validateLevel(level: LevelData) {
     ) {
       throw new EngineError('E10', 0, 'Data level tidak valid: ada ruas jalan yang tidak lengkap.');
     }
+
+    if (
+      edge.geometry &&
+      (edge.geometry.length < 2 ||
+        !edge.geometry.every(
+          (coordinate) =>
+            coordinate.length === 2 && coordinate.every(Number.isFinite),
+        ) ||
+        edge.geometry[0][0] !== level.nodes[edge.from][0] ||
+        edge.geometry[0][1] !== level.nodes[edge.from][1] ||
+        edge.geometry.at(-1)?.[0] !== level.nodes[edge.to][0] ||
+        edge.geometry.at(-1)?.[1] !== level.nodes[edge.to][1])
+    ) {
+      throw new EngineError('E10', 0, 'Data level tidak valid: geometri ruas jalan tidak cocok dengan titik rute.');
+    }
   }
 
   const reachableBearings = [0, 90, 180, 270].map((turn) => (level.start.bearing + turn) % 360);

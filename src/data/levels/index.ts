@@ -12,6 +12,14 @@ function isCommandName(value: string): value is CommandName {
 }
 
 function processLevelData(levelJson: any, fileName: string): LevelData {
+  if (
+    typeof levelJson.mission !== 'string' ||
+    typeof levelJson.start_label !== 'string' ||
+    typeof levelJson.goal_label !== 'string'
+  ) {
+    throw new Error(`${fileName} must define its mission and place labels.`);
+  }
+
   const allowedCommands = levelJson.allowed_commands.filter(isCommandName);
   if (allowedCommands.length !== levelJson.allowed_commands.length) {
     throw new Error(`${fileName} contains an unsupported command.`);

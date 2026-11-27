@@ -76,11 +76,16 @@ export interface RoadEdge {
   from: string;
   to: string;
   bearing: number;
+  name?: string;
+  geometry?: [number, number][];
 }
 
 export interface LevelData {
   level_id: string;
   title: string;
+  mission: string;
+  start_label: string;
+  goal_label: string;
   allowed_commands: CommandName[];
   optimal_loc: number;
   star_thresholds?: {
@@ -103,6 +108,7 @@ export interface TrajectoryStep {
   stepIndex: number;
   action: TrajectoryAction;
   coordinate: [number, number];
+  geometry?: [number, number][];
   bearing: number;
   nodeId: string;
   line: number;

@@ -19,7 +19,7 @@ Fondasi compiler, fixture level, editor, peta/animasi, penilaian LOC, progres lo
 | Bagian | Teknologi |
 |---|---|
 | Framework | React Native (Expo), TypeScript |
-| Peta | MapLibre React Native (ADR-06, offline tanpa basemap) |
+| Peta | MapLibre React Native + extract GeoJSON OpenStreetMap offline (ADR-06) |
 | Animasi | Reanimated |
 | State | React state |
 | Persistensi | AsyncStorage |

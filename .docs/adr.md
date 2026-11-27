@@ -110,26 +110,18 @@ Catatan keputusan arsitektur dan desain. ADR-01–08 diterima pada **10 November
 
 ---
 
-## ADR-06 — Peta offline
+## ADR-06 — Peta Bandung offline berbasis OpenStreetMap
 
-**Konteks.** SRS mewajibkan 100% offline, tetapi cara menyediakan ubin peta tanpa internet belum ditetapkan. Pustaka MapLibre untuk React Native memiliki modul paket offline (membuat paket berdasarkan wilayah dan zoom, serta memuat basis data offline dari berkas). Server ubin publik OpenStreetMap melarang penggunaan offline dan unduhan massal; untuk kebutuhan itu disarankan ubin yang dihosting sendiri atau penyedia yang mengizinkan.
+**Konteks.** SRS mewajibkan aplikasi berfungsi 100% offline. Peta perlu menunjukkan bentuk jalan Bandung yang nyata dan rute level harus mengikuti geometri jalan, bukan garis skematik.
 
-**Opsi.**
-- A. Unduh paket peta saat pertama online.
-- B. Ubin lokal buatan sendiri.
-- C. Gambar jaringan jalan dari GeoJSON level, tanpa ubin dasar.
-- D. Online dengan cache.
-
-**Keputusan.** Opsi C untuk versi pertama.
-- MapLibre menggambar jalan, simpul, dan penanda motor dari data level di atas latar polos.
-- Koordinat dan bentuk jalan tetap nyata (Bandung), tampilannya skematik.
-- Opsi B menjadi peningkatan nanti, didahului percobaan kecil untuk memverifikasi format ubin yang diterima.
+**Keputusan.** MapLibre React Native merender GeoJSON jalan OpenStreetMap yang dibundel bersama aplikasi. Extract mencakup koridor level di pusat Bandung; tidak ada permintaan tile atau jaringan saat runtime. Graph level menggunakan geometri jalan yang sama untuk menggambar rute dan menggerakkan kendaraan.
 
 **Konsekuensi.**
-- Tidak ada ketergantungan pada penyedia ubin atau ketentuannya; risiko terbesar proyek berkurang.
-- Atribusi OpenStreetMap tetap dicantumkan karena data jalan bersumber dari sana.
-- Teks label di dalam peta memerlukan font yang tersedia offline; verifikasi, atau gunakan label di lapisan UI.
-- Pustaka peta dipilih: MapLibre (React Native); kemungkinan memerlukan development build.
+- Aplikasi tidak memerlukan API key atau koneksi internet untuk membuka peta.
+- Data extract dibatasi ke wilayah gameplay, bukan seluruh Kota Bandung; perubahan peta perlu memperbarui aset GeoJSON dan graph level.
+- Cantumkan tautan atribusi © OpenStreetMap contributors dan lisensi ODbL 1.0 pada layar peta.
+- Data tersedia di `src/data/maps/bandung-roads.json`; sumbernya OpenStreetMap API, bbox `107.602,-6.927,107.615,-6.915`.
+- MapLibre Native memerlukan development build; Expo Go tidak menyediakan modul tersebut.
 
 ---
 

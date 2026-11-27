@@ -1,25 +1,52 @@
 {
   "level_id": "lvl_02",
-  "title": "Materi Rotasi",
+  "title": "Gedung Merdeka ke Jalan Braga",
+  "mission": "Antarkan kendaraan dari Gedung Merdeka ke Jalan Braga di sebelah utara.",
+  "start_label": "Gedung Merdeka",
+  "goal_label": "Jalan Braga (utara)",
   "allowed_commands": ["maju", "belokKanan", "belokKiri"],
-  "optimal_loc": 4,
+  "optimal_loc": 3,
   "start": {
     "node": "A",
     "bearing": 90
   },
-  "goal": "D",
+  "goal": "C",
   "nodes": {
-    "A": [107.607, -6.9215],
-    "B": [107.608, -6.9215],
-    "C": [107.608, -6.9225],
-    "D": [107.609, -6.9225]
+    "A": [107.609185, -6.921381],
+    "B": [107.6098267, -6.921461],
+    "C": [107.6099747, -6.9197157]
   },
   "edges": [
-    { "from": "A", "to": "B", "bearing": 90 },
-    { "from": "B", "to": "A", "bearing": 270 },
-    { "from": "B", "to": "C", "bearing": 180 },
-    { "from": "C", "to": "B", "bearing": 0 },
-    { "from": "C", "to": "D", "bearing": 90 },
-    { "from": "D", "to": "C", "bearing": 270 }
+    {
+      "from": "A",
+      "to": "B",
+      "bearing": 90,
+      "name": "Jalan Asia Afrika",
+      "geometry": [
+        [107.609185, -6.921381],
+        [107.60928, -6.921392],
+        [107.60946, -6.921412],
+        [107.6097986, -6.9214572],
+        [107.6098267, -6.921461]
+      ]
+    },
+    {
+      "from": "B",
+      "to": "C",
+      "bearing": 0,
+      "name": "Jalan Braga",
+      "geometry": [
+        [107.6098267, -6.921461],
+        [107.6098389, -6.9213864],
+        [107.6099129, -6.9209043],
+        [107.6099483, -6.9206209],
+        [107.6099601, -6.9202908],
+        [107.6099761, -6.9200538],
+        [107.6099795, -6.920004],
+        [107.6099897, -6.9198527],
+        [107.6099923, -6.9198142],
+        [107.6099747, -6.9197157]
+      ]
+    }
   ]
 }

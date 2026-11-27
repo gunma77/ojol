@@ -39,7 +39,7 @@ Perintah yang tersedia berbeda di tiap level (`allowed_commands`). Aturan sintak
 | Bagian | Teknologi |
 |---|---|
 | Framework | React Native (Expo), TypeScript |
-| Peta | MapLibre atau react-native-maps (belum diputuskan) |
+| Peta | MapLibre React Native + extract GeoJSON OpenStreetMap offline |
 | Animasi | Reanimated |
 | State | Zustand |
 | Penyimpanan | AsyncStorage |

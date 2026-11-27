@@ -51,6 +51,9 @@ export function LevelListScreen({
               </View>
               <View style={styles.levelDetails}>
                 <Text style={[styles.levelTitle, !unlocked && styles.lockedText]}>{level.title}</Text>
+                <Text numberOfLines={2} style={styles.mission}>
+                  {level.mission}
+                </Text>
                 <Text style={styles.levelStatus}>
                   {unlocked ? `Terbuka · Bintang ${stars}/3` : 'Terkunci'}
                 </Text>
@@ -138,6 +141,11 @@ const styles = StyleSheet.create({
     color: '#1e2b24',
     fontSize: 15,
     fontWeight: '700',
+  },
+  mission: {
+    color: '#69766e',
+    fontSize: 11,
+    lineHeight: 15,
   },
   lockedText: {
     color: '#77827b',
